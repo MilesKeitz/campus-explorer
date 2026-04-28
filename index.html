@@ -266,6 +266,12 @@ const BUILDINGS = [
     // TOUR KEYFRAMES: paste copied positions here
     // { pos:{x,y,z}, lookAt:{x,y,z}, label:"Name" }
     tourKeyframes: [
+      { pos:{x:4.283,y:0.195,z:0.358}, yaw:0.8400, pitch:-0.2800, roll:-0.6000, label:"Viewpoint 1" },
+      { pos:{x:3.788,y:-0.103,z:-0.234}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 2" },
+      { pos:{x:3.238,y:-0.494,z:-0.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 3" },
+      { pos:{x:2.713,y:-0.870,z:-1.154}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 4" },
+      { pos:{x:2.147,y:-1.330,z:-1.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 5" },
+      { pos:{x:1.542,y:-1.827,z:-2.293}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 6" }
       // Example — replace with your real copied positions:
       // { pos:{x:0,y:1,z:8},   lookAt:{x:0,y:0,z:0}, label:"Front View"  },
       // { pos:{x:6,y:2,z:4},   lookAt:{x:0,y:0,z:0}, label:"Side Angle"  },
@@ -508,6 +514,18 @@ async function loadBuilding(b) {
       copyBtn.classList.add("show");
       tourToggleBtn.classList.add("show");
       updateTourUI();
+
+      // Jump to first keyframe as starting viewpoint
+      const kf = b.tourKeyframes;
+      if (kf && kf.length > 0) {
+        const { pos, yaw = 0, pitch = 0, roll = 0 } = kf[0];
+        camera.position.set(pos.x, pos.y, pos.z);
+        camYaw = yaw; camPitch = pitch; camRoll = roll;
+        const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+        const qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
+        const qR = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll);
+        camera.quaternion.copy(qY.multiply(qP).multiply(qR));
+      }
     }, 400);
 
   } catch (err) {
