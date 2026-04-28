@@ -515,6 +515,18 @@ async function loadBuilding(b) {
       copyBtn.classList.add("show");
       tourToggleBtn.classList.add("show");
       updateTourUI();
+
+      // Jump to first keyframe as starting viewpoint
+      const kf = b.tourKeyframes;
+      if (kf && kf.length > 0) {
+        const { pos, yaw = 0, pitch = 0, roll = 0 } = kf[0];
+        camera.position.set(pos.x, pos.y, pos.z);
+        camYaw = yaw; camPitch = pitch; camRoll = roll;
+        const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+        const qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
+        const qR = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll);
+        camera.quaternion.copy(qY.multiply(qP).multiply(qR));
+      }
     }, 400);
 
   } catch (err) {
