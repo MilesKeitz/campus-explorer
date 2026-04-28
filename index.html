@@ -241,8 +241,6 @@ const BUILDINGS = [
       maxY: 12,
     },
 
-    // TOUR KEYFRAMES: paste copied positions here
-    // { pos:{x,y,z}, lookAt:{x,y,z}, label:"Name" }
     tourKeyframes: [
       { pos:{x:3.584,y:-2.243,z:-1.916}, yaw:-4.4000, pitch:0.7200, roll:-0.7000, label:"Viewpoint 1" },
       { pos:{x:3.211,y:-1.273,z:-1.113}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 2" },
@@ -263,10 +261,7 @@ const BUILDINGS = [
       { pos:{x:-0.564,y:-1.782,z:-1.890}, yaw:-7.5000, pitch:-0.3600, roll:0.7000, label:"Viewpoint 17" },
       { pos:{x:0.180,y:-3.042,z:-3.031}, yaw:-8.0400, pitch:0.2200, roll:0.7600, label:"Viewpoint 18" },
       { pos:{x:1.943,y:-2.901,z:-2.788}, yaw:-8.6400, pitch:0.5600, roll:0.6000, label:"Viewpoint 19" }
-      // Example — replace with your real copied positions:
-      // { pos:{x:0,y:1,z:8},   lookAt:{x:0,y:0,z:0}, label:"Front View"  },
-      // { pos:{x:6,y:2,z:4},   lookAt:{x:0,y:0,z:0}, label:"Side Angle"  },
-      // { pos:{x:0,y:6,z:6},   lookAt:{x:0,y:0,z:0}, label:"Aerial View" },
+      
     ],
   },
 
@@ -283,8 +278,6 @@ const BUILDINGS = [
       maxY: 12,
     },
 
-    // TOUR KEYFRAMES: paste copied positions here
-    // { pos:{x,y,z}, lookAt:{x,y,z}, label:"Name" }
     tourKeyframes: [
       { pos:{x:4.283,y:0.195,z:0.358}, yaw:0.8400, pitch:-0.2800, roll:-0.6000, label:"Viewpoint 1" },
       { pos:{x:3.788,y:-0.103,z:-0.234}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 2" },
@@ -292,21 +285,30 @@ const BUILDINGS = [
       { pos:{x:2.713,y:-0.870,z:-1.154}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 4" },
       { pos:{x:2.147,y:-1.330,z:-1.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 5" },
       { pos:{x:1.542,y:-1.827,z:-2.293}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 6" }
-      // Example — replace with your real copied positions:
-      // { pos:{x:0,y:1,z:8},   lookAt:{x:0,y:0,z:0}, label:"Front View"  },
-      // { pos:{x:6,y:2,z:4},   lookAt:{x:0,y:0,z:0}, label:"Side Angle"  },
-      // { pos:{x:0,y:6,z:6},   lookAt:{x:0,y:0,z:0}, label:"Aerial View" },
+    ],
+  },
+
+  {
+      id: "b3",
+      name: "Frank E. Pilling Computer Science",
+      file: "frank.splat",
+      meta: "College of Engineering",
+
+      bounds: {
+      center: new THREE.Vector3(0, 0, 0),
+      radius: 20,
+      minY: -6,
+      maxY: 12,
+    },
+
+    tourKeyframes: [
     ],
     }
-  // ── Add more buildings below ──
-  // {
-  //   id: "b2",
-  //   name: "Kennedy Library",
-  //   file: "kennedy-library.splat",
-  //   meta: "Robert E. Kennedy Library",
-  //   bounds: { center: new THREE.Vector3(0,0,0), radius:15, minY:-5, maxY:10 },
-  //   tourKeyframes: [],
-  // },
+
+
+
+
+  
 ];
 // ══════════════════════════════════════════════════════════════
 
