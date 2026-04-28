@@ -110,7 +110,7 @@
     #copy-toast.show { opacity:1; }
 
     /* TOUR TOGGLE */
-    #tour-toggle { display:block; background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:5px 14px; font-size:11px; cursor:pointer; font-family:'Source Sans 3',sans-serif; letter-spacing:0.05em; transition:background 0.15s; margin-right:8px; }
+    #tour-toggle { display:none; background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:5px 14px; font-size:11px; cursor:pointer; font-family:'Source Sans 3',sans-serif; letter-spacing:0.05em; transition:background 0.15s; margin-right:8px; }
     #tour-toggle.show { display:block; }
     #tour-toggle:hover { background:rgba(255,255,255,0.22); }
     #tour-toggle.on { background:var(--gold); color:var(--green); border-color:var(--gold); }
@@ -266,12 +266,6 @@ const BUILDINGS = [
     // TOUR KEYFRAMES: paste copied positions here
     // { pos:{x,y,z}, lookAt:{x,y,z}, label:"Name" }
     tourKeyframes: [
-      { pos:{x:4.443,y:0.408,z:0.359}, lookAt:{x:0.792,y:-2.076,z:-1.985}, label:"Viewpoint 1" },
-      { pos:{x:3.776,y:-0.148,z:-0.251}, lookAt:{x:-0.550,y:-1.910,z:-2.033}, label:"Viewpoint 2" },
-      { pos:{x:3.344,y:-0.460,z:-0.670}, lookAt:{x:-0.983,y:-2.221,z:-2.453}, label:"Viewpoint 3" },
-      { pos:{x:2.696,y:-0.801,z:-1.287}, lookAt:{x:-1.631,y:-2.562,z:-3.069}, label:"Viewpoint 4" },
-      { pos:{x:1.917,y:-1.273,z:-2.015}, lookAt:{x:-2.410,y:-3.034,z:-3.798}, label:"Viewpoint 5" },
-      { pos:{x:1.344,y:-1.817,z:-2.751}, lookAt:{x:-2.983,y:-3.578,z:-4.534}, label:"Viewpoint 6" }
       // Example — replace with your real copied positions:
       // { pos:{x:0,y:1,z:8},   lookAt:{x:0,y:0,z:0}, label:"Front View"  },
       // { pos:{x:6,y:2,z:4},   lookAt:{x:0,y:0,z:0}, label:"Side Angle"  },
@@ -596,14 +590,13 @@ function flyTo(idx) {
 
   const startPos = camera.position.clone();
   const endPos   = new THREE.Vector3(pos.x, pos.y, pos.z);
-  const endLook  = new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z);
 
-  // Compute end quaternion
+  // Build end quaternion from yaw/pitch/roll
   const startQ = camera.quaternion.clone();
-  const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), yaw);
-  const qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), pitch);
-  const qR = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), roll);
-  const endQ = qY.multiply(qP).multiply(qR);
+  const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+  const qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
+  const qR = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll);
+  const endQ = qY.clone().multiply(qP).multiply(qR);
 
   const t0 = performance.now();
   function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
@@ -617,6 +610,7 @@ function flyTo(idx) {
       tourAnimId = requestAnimationFrame(step);
     } else {
       tourAnimId = null;
+      // Sync camYaw/pitch/roll so IJKL keys work correctly after landing
       camYaw = yaw; camPitch = pitch; camRoll = roll;
       if (tourPlaying) tourTimer = setTimeout(advance, HOLD_MS);
     }
