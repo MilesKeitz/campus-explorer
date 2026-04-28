@@ -549,10 +549,7 @@ function enforceBounds({ center, radius, minY, maxY }) {
 window.copyPos = function() {
   if (!camera) return;
   const p = camera.position;
-  // Estimate lookAt from camera direction
-  const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-  const t = p.clone().addScaledVector(dir, 5);
-  const text = `{ pos:{x:${p.x.toFixed(3)},y:${p.y.toFixed(3)},z:${p.z.toFixed(3)}}, lookAt:{x:${t.x.toFixed(3)},y:${t.y.toFixed(3)},z:${t.z.toFixed(3)}}, label:"Viewpoint" }`;
+  const text = `{ pos:{x:${p.x.toFixed(3)},y:${p.y.toFixed(3)},z:${p.z.toFixed(3)}}, yaw:${camYaw.toFixed(4)}, pitch:${camPitch.toFixed(4)}, roll:${camRoll.toFixed(4)}, label:"Viewpoint" }`;
   navigator.clipboard.writeText(text).then(() => {
     copyToast.classList.add("show");
     setTimeout(() => copyToast.classList.remove("show"), 2200);
@@ -593,7 +590,7 @@ function updateTourUI() {
 function flyTo(idx) {
   const kf = getKF();
   if (!kf.length || !camera) return;
-  const { pos, lookAt } = kf[idx];
+  const { pos, yaw = 0, pitch = 0, roll = 0 } = kf[idx];
 
   if (tourAnimId) { cancelAnimationFrame(tourAnimId); tourAnimId = null; }
 
@@ -602,11 +599,11 @@ function flyTo(idx) {
   const endLook  = new THREE.Vector3(lookAt.x, lookAt.y, lookAt.z);
 
   // Compute end quaternion
-  const dummy = new THREE.Object3D();
-  dummy.position.copy(endPos);
-  dummy.lookAt(endLook);
   const startQ = camera.quaternion.clone();
-  const endQ   = dummy.quaternion.clone();
+  const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), yaw);
+  const qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), pitch);
+  const qR = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), roll);
+  const endQ = qY.multiply(qP).multiply(qR);
 
   const t0 = performance.now();
   function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
@@ -620,6 +617,7 @@ function flyTo(idx) {
       tourAnimId = requestAnimationFrame(step);
     } else {
       tourAnimId = null;
+      camYaw = yaw; camPitch = pitch; camRoll = roll;
       if (tourPlaying) tourTimer = setTimeout(advance, HOLD_MS);
     }
   }
