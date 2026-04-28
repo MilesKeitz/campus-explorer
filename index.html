@@ -472,6 +472,7 @@ async function loadBuilding(b) {
   try {
     splatMesh = new SplatMesh({ url });
     spatMesh.rotation.x = Math.PI;
+    splatMesh.scale.y = -1;
     scene.add(splatMesh);
 
     // Wait for splat to be ready
