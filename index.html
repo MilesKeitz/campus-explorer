@@ -115,6 +115,12 @@
     #tour-toggle:hover { background:rgba(255,255,255,0.22); }
     #tour-toggle.on { background:var(--gold); color:var(--green); border-color:var(--gold); }
 
+    .cat-header { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--green); background:var(--cream); border-bottom:1px solid var(--border); cursor:pointer; user-select:none; }
+    .cat-header:hover { background:#eef6f1; }
+    .cat-header.collapsed + .cat-body { display:none; }
+    .cat-count { background:var(--border); border-radius:10px; padding:1px 7px; font-size:10px; color:var(--text-muted); }
+
+
     #stripe { height:4px; background:linear-gradient(90deg,var(--green) 60%,var(--gold) 100%); flex-shrink:0; }
   </style>
 </head>
@@ -226,102 +232,126 @@ import { SparkRenderer, SplatMesh, SparkControls } from "@sparkjsdev/spark";
 // ══════════════════════════════════════════════════════════════
 const BASE_URL = "https://pub-a2f3fdfc4c7b44ec861e235eeeacaf6f.r2.dev";
 
-const BUILDINGS = [
+const CATEGORIES = [
   {
-    id: "b1",
-    name: "Warren J. Baker Center for Science and Mathematics",
-    file: "baker_geocam_2.splat",
-    meta: "Bailey College of Science and Mathematics",
+    name: "Bailey College of Science and Mathematics",
+    buidlings: [
+      {
+        id: "b1",
+        name: "Warren J. Baker Center for Science and Mathematics",
+        file: "baker_geocam_2.splat",
+        meta: "Bailey College of Science and Mathematics",
 
-    // BOUNDARY: tweak center/radius once splat loads
-    bounds: {
-      center: new THREE.Vector3(0, 0, 0),
-      radius: 20,
-      minY: -6,
-      maxY: 12,
-    },
+        // BOUNDARY: tweak center/radius once splat loads
+        bounds: {
+          center: new THREE.Vector3(0, 0, 0),
+          radius: 20,
+          minY: -6,
+          maxY: 12,
+        },
 
-    tourKeyframes: [
-      { pos:{x:3.584,y:-2.243,z:-1.916}, yaw:-4.4000, pitch:0.7200, roll:-0.7000, label:"Viewpoint 1" },
-      { pos:{x:3.211,y:-1.273,z:-1.113}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 2" },
-      { pos:{x:2.870,y:-0.693,z:-0.615}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 3" },
-      { pos:{x:2.437,y:0.103,z:0.105}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 4" },
-      { pos:{x:1.994,y:0.764,z:0.825}, yaw:-4.6600, pitch:0.4200, roll:-0.8000, label:"Viewpoint 5" },
-      { pos:{x:0.898,y:1.837,z:1.870}, yaw:-4.5000, pitch:0.2200, roll:-0.7200, label:"Viewpoint 6" },
-      { pos:{x:0.010,y:2.538,z:2.600}, yaw:-4.8200, pitch:0.2200, roll:-0.7200, label:"Viewpoint 7" },
-      { pos:{x:-1.276,y:3.333,z:3.144}, yaw:-5.1200, pitch:-0.2600, roll:-0.7200, label:"Viewpoint 8" },
-      { pos:{x:-2.614,y:2.680,z:2.303}, yaw:-5.4800, pitch:-0.5200, roll:-0.4600, label:"Viewpoint 9" },
-      { pos:{x:-3.694,y:2.444,z:2.102}, yaw:-6.9000, pitch:-0.5200, roll:0.3600, label:"Viewpoint 10" },
-      { pos:{x:-3.945,y:1.860,z:1.546}, yaw:-7.7200, pitch:-0.2600, roll:0.7400, label:"Viewpoint 11" },
-      { pos:{x:-3.200,y:1.526,z:1.310}, yaw:-7.6200, pitch:-0.2600, roll:0.6600, label:"Viewpoint 12" },
-      { pos:{x:-2.182,y:1.088,z:0.878}, yaw:-7.5000, pitch:-0.2600, roll:0.6600, label:"Viewpoint 13" },
-      { pos:{x:-1.502,y:0.316,z:0.226}, yaw:-7.5000, pitch:-0.2600, roll:0.6600, label:"Viewpoint 14" },
-      { pos:{x:-1.188,y:-0.182,z:-0.344}, yaw:-7.3400, pitch:-0.4600, roll:0.6200, label:"Viewpoint 15" },
-      { pos:{x:-0.898,y:-1.011,z:-1.143}, yaw:-7.3000, pitch:-0.4600, roll:0.6200, label:"Viewpoint 16" },
-      { pos:{x:-0.564,y:-1.782,z:-1.890}, yaw:-7.5000, pitch:-0.3600, roll:0.7000, label:"Viewpoint 17" },
-      { pos:{x:0.180,y:-3.042,z:-3.031}, yaw:-8.0400, pitch:0.2200, roll:0.7600, label:"Viewpoint 18" },
-      { pos:{x:1.943,y:-2.901,z:-2.788}, yaw:-8.6400, pitch:0.5600, roll:0.6000, label:"Viewpoint 19" }
-      
-    ],
+        tourKeyframes: [
+          { pos:{x:3.584,y:-2.243,z:-1.916}, yaw:-4.4000, pitch:0.7200, roll:-0.7000, label:"Viewpoint 1" },
+          { pos:{x:3.211,y:-1.273,z:-1.113}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 2" },
+          { pos:{x:2.870,y:-0.693,z:-0.615}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 3" },
+          { pos:{x:2.437,y:0.103,z:0.105}, yaw:-4.3000, pitch:0.4600, roll:-0.7000, label:"Viewpoint 4" },
+          { pos:{x:1.994,y:0.764,z:0.825}, yaw:-4.6600, pitch:0.4200, roll:-0.8000, label:"Viewpoint 5" },
+          { pos:{x:0.898,y:1.837,z:1.870}, yaw:-4.5000, pitch:0.2200, roll:-0.7200, label:"Viewpoint 6" },
+          { pos:{x:0.010,y:2.538,z:2.600}, yaw:-4.8200, pitch:0.2200, roll:-0.7200, label:"Viewpoint 7" },
+          { pos:{x:-1.276,y:3.333,z:3.144}, yaw:-5.1200, pitch:-0.2600, roll:-0.7200, label:"Viewpoint 8" },
+          { pos:{x:-2.614,y:2.680,z:2.303}, yaw:-5.4800, pitch:-0.5200, roll:-0.4600, label:"Viewpoint 9" },
+          { pos:{x:-3.694,y:2.444,z:2.102}, yaw:-6.9000, pitch:-0.5200, roll:0.3600, label:"Viewpoint 10" },
+          { pos:{x:-3.945,y:1.860,z:1.546}, yaw:-7.7200, pitch:-0.2600, roll:0.7400, label:"Viewpoint 11" },
+          { pos:{x:-3.200,y:1.526,z:1.310}, yaw:-7.6200, pitch:-0.2600, roll:0.6600, label:"Viewpoint 12" },
+          { pos:{x:-2.182,y:1.088,z:0.878}, yaw:-7.5000, pitch:-0.2600, roll:0.6600, label:"Viewpoint 13" },
+          { pos:{x:-1.502,y:0.316,z:0.226}, yaw:-7.5000, pitch:-0.2600, roll:0.6600, label:"Viewpoint 14" },
+          { pos:{x:-1.188,y:-0.182,z:-0.344}, yaw:-7.3400, pitch:-0.4600, roll:0.6200, label:"Viewpoint 15" },
+          { pos:{x:-0.898,y:-1.011,z:-1.143}, yaw:-7.3000, pitch:-0.4600, roll:0.6200, label:"Viewpoint 16" },
+          { pos:{x:-0.564,y:-1.782,z:-1.890}, yaw:-7.5000, pitch:-0.3600, roll:0.7000, label:"Viewpoint 17" },
+          { pos:{x:0.180,y:-3.042,z:-3.031}, yaw:-8.0400, pitch:0.2200, roll:0.7600, label:"Viewpoint 18" },
+          { pos:{x:1.943,y:-2.901,z:-2.788}, yaw:-8.6400, pitch:0.5600, roll:0.6000, label:"Viewpoint 19" }
+          
+        ],
+      },
+
+      {
+          id: "b2",
+          name: "William and Linda Frost Center for Research and Innovation",
+          file: "frost.splat",
+          meta: "Bailey College of Science and Mathematics",
+
+          bounds: {
+          center: new THREE.Vector3(0, 0, 0),
+          radius: 20,
+          minY: -6,
+          maxY: 12,
+        },
+
+        tourKeyframes: [
+          { pos:{x:4.283,y:0.195,z:0.358}, yaw:0.8400, pitch:-0.2800, roll:-0.6000, label:"Viewpoint 1" },
+          { pos:{x:3.788,y:-0.103,z:-0.234}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 2" },
+          { pos:{x:3.238,y:-0.494,z:-0.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 3" },
+          { pos:{x:2.713,y:-0.870,z:-1.154}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 4" },
+          { pos:{x:2.147,y:-1.330,z:-1.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 5" },
+          { pos:{x:1.542,y:-1.827,z:-2.293}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 6" }
+        ],
+      },
+
+
+
+
+    ]
   },
 
-  {
-      id: "b2",
-      name: "William and Linda Frost Center for Research and Innovation",
-      file: "frost.splat",
-      meta: "Bailey College of Science and Mathematics",
 
-      bounds: {
-      center: new THREE.Vector3(0, 0, 0),
-      radius: 20,
-      minY: -6,
-      maxY: 12,
-    },
 
-    tourKeyframes: [
-      { pos:{x:4.283,y:0.195,z:0.358}, yaw:0.8400, pitch:-0.2800, roll:-0.6000, label:"Viewpoint 1" },
-      { pos:{x:3.788,y:-0.103,z:-0.234}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 2" },
-      { pos:{x:3.238,y:-0.494,z:-0.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 3" },
-      { pos:{x:2.713,y:-0.870,z:-1.154}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 4" },
-      { pos:{x:2.147,y:-1.330,z:-1.702}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 5" },
-      { pos:{x:1.542,y:-1.827,z:-2.293}, yaw:0.9600, pitch:-0.4400, roll:-0.6000, label:"Viewpoint 6" }
-    ],
-  },
+
+
+
 
   {
-      id: "b3",
-      name: "Frank E. Pilling Computer Science",
-      file: "frank.splat",
-      meta: "College of Engineering",
+    name: "College of Engineering",
+    buildings: [
+      {
+        id: "b3",
+        name: "Frank E. Pilling Computer Science",
+        file: "frank.splat",
+        meta: "College of Engineering",
 
-      bounds: {
-      center: new THREE.Vector3(0, 0, 0),
-      radius: 20,
-      minY: -6,
-      maxY: 12,
+        bounds: {
+        center: new THREE.Vector3(0, 0, 0),
+        radius: 20,
+        minY: -6,
+        maxY: 12,
+      },
+
+      tourKeyframes: [
+        { pos:{x:-1.802,y:2.965,z:-2.549}, yaw:-1.8600, pitch:-0.4200, roll:-0.7000, label:"Viewpoint 1" },
+        { pos:{x:-0.691,y:3.053,z:-2.817}, yaw:-2.2400, pitch:-0.5600, roll:-0.5200, label:"Viewpoint 2" },
+        { pos:{x:1.347,y:2.678,z:-2.570}, yaw:-2.5400, pitch:-0.7800, roll:-0.3200, label:"Viewpoint 3" },
+        { pos:{x:1.847,y:2.106,z:-2.121}, yaw:-3.1600, pitch:-0.7200, roll:0.1400, label:"Viewpoint 4" },
+        { pos:{x:1.791,y:1.445,z:-1.495}, yaw:-3.1600, pitch:-0.8400, roll:0.1400, label:"Viewpoint 5" },
+        { pos:{x:1.922,y:0.756,z:-0.789}, yaw:-3.4000, pitch:-0.8400, roll:0.3200, label:"Viewpoint 6" },
+        { pos:{x:2.110,y:0.015,z:-0.091}, yaw:-2.6000, pitch:-0.7400, roll:-0.3200, label:"Viewpoint 7" },
+        { pos:{x:3.121,y:-0.437,z:0.268}, yaw:-2.7800, pitch:-0.7400, roll:-0.1400, label:"Viewpoint 8" },
+        { pos:{x:3.587,y:-1.124,z:0.941}, yaw:-3.1200, pitch:-0.7400, roll:0.0800, label:"Viewpoint 9" },
+        { pos:{x:3.952,y:-2.365,z:2.094}, yaw:-3.1200, pitch:-0.8000, roll:0.0800, label:"Viewpoint 10" },
+        { pos:{x:3.901,y:-3.860,z:3.476}, yaw:-5.1200, pitch:0.3800, roll:0.6800, label:"Viewpoint 11" },
+        { pos:{x:2.488,y:-3.545,z:3.178}, yaw:-5.1200, pitch:0.3800, roll:0.6800, label:"Viewpoint 12" },
+        { pos:{x:0.871,y:-3.107,z:2.926}, yaw:-5.1200, pitch:0.3800, roll:0.6800, label:"Viewpoint 13" },
+        { pos:{x:-1.773,y:-2.534,z:2.445}, yaw:-6.5000, pitch:0.8200, roll:-0.1600, label:"Viewpoint 14" },
+        { pos:{x:-1.760,y:-1.173,z:1.115}, yaw:-6.5000, pitch:0.8200, roll:-0.1600, label:"Viewpoint 15" },
+        { pos:{x:-1.672,y:1.782,z:-1.577}, yaw:-6.5000, pitch:0.8200, roll:-0.1600, label:"Viewpoint 16" }
+      ],
     },
 
-    tourKeyframes: [
-      { pos:{x:-1.802,y:2.965,z:-2.549}, yaw:-1.8600, pitch:-0.4200, roll:-0.7000, label:"Viewpoint 1" },
-      { pos:{x:-0.691,y:3.053,z:-2.817}, yaw:-2.2400, pitch:-0.5600, roll:-0.5200, label:"Viewpoint 2" },
-      { pos:{x:1.347,y:2.678,z:-2.570}, yaw:-2.5400, pitch:-0.7800, roll:-0.3200, label:"Viewpoint 3" },
-      { pos:{x:1.847,y:2.106,z:-2.121}, yaw:-3.1600, pitch:-0.7200, roll:0.1400, label:"Viewpoint 4" },
-      { pos:{x:1.791,y:1.445,z:-1.495}, yaw:-3.1600, pitch:-0.8400, roll:0.1400, label:"Viewpoint 5" },
-      { pos:{x:1.922,y:0.756,z:-0.789}, yaw:-3.4000, pitch:-0.8400, roll:0.3200, label:"Viewpoint 6" },
-      { pos:{x:2.110,y:0.015,z:-0.091}, yaw:-2.6000, pitch:-0.7400, roll:-0.3200, label:"Viewpoint 7" },
-      { pos:{x:3.121,y:-0.437,z:0.268}, yaw:-2.7800, pitch:-0.7400, roll:-0.1400, label:"Viewpoint 8" },
-      { pos:{x:3.587,y:-1.124,z:0.941}, yaw:-3.1200, pitch:-0.7400, roll:0.0800, label:"Viewpoint 9" },
-      { pos:{x:3.952,y:-2.365,z:2.094}, yaw:-3.1200, pitch:-0.8000, roll:0.0800, label:"Viewpoint 10" },
-      { pos:{x:3.901,y:-3.860,z:3.476}, yaw:-5.1200, pitch:0.3800, roll:0.6800, label:"Viewpoint 11" },
-      { pos:{x:2.488,y:-3.545,z:3.178}, yaw:-5.1200, pitch:0.3800, roll:0.6800, label:"Viewpoint 12" },
-      { pos:{x:0.871,y:-3.107,z:2.926}, yaw:-5.1200, pitch:0.3800, roll:0.6800, label:"Viewpoint 13" },
-      { pos:{x:-1.773,y:-2.534,z:2.445}, yaw:-6.5000, pitch:0.8200, roll:-0.1600, label:"Viewpoint 14" },
-      { pos:{x:-1.760,y:-1.173,z:1.115}, yaw:-6.5000, pitch:0.8200, roll:-0.1600, label:"Viewpoint 15" },
-      { pos:{x:-1.672,y:1.782,z:-1.577}, yaw:-6.5000, pitch:0.8200, roll:-0.1600, label:"Viewpoint 16" }
-    ],
-    }
 
 
+
+
+    ]
+  }
+  
 
 
   
@@ -429,23 +459,52 @@ function destroyViewer() {
 // ── BUILDING LIST ──────────────────────────────────────────────
 function renderList(filter = "") {
   listEl.innerHTML = "";
-  const f = BUILDINGS.filter(b =>
-    b.name.toLowerCase().includes(filter.toLowerCase()) ||
-    (b.meta || "").toLowerCase().includes(filter.toLowerCase())
-  );
-  countEl.textContent = `${f.length} total`;
-  if (!f.length) {
-    listEl.innerHTML = `<div style="padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px;">No buildings found.</div>`;
-    return;
-  }
-  f.forEach(b => {
-    const el = document.createElement("div");
-    el.className = "building-item" + (b.id === activeId ? " active" : "");
-    el.innerHTML = `<div class="b-info"><div class="b-name">${b.name}</div>${b.meta ? `<div class="b-meta">${b.meta}</div>` : ""}</div><div class="b-arrow">›</div>`;
-    el.addEventListener("click", () => loadBuilding(b));
-    listEl.appendChild(el);
+  let totalShown = 0;
+
+  CATEGORIES.forEach(cat => {
+    const filtered = cat.buildings.filter(b =>
+      b.name.toLowerCase().includes(filter.toLowerCase()) ||
+      (b.meta || "").toLowerCase().includes(filter.toLowerCase())
+    );
+    if (filtered.length === 0) return;
+    totalShown += filtered.length;
+
+    // Category header
+    const header = document.createElement("div");
+    header.className = "cat-header";
+    header.innerHTML = `<span>${cat.name}</span><span class="cat-count">${filtered.length}</span>`;
+    header.addEventListener("click", () => {
+      const body = header.nextSibling;
+      body.classList.toggle("collapsed");
+      header.classList.toggle("collapsed");
+    });
+    listEl.appendChild(header);
+
+    // Buildings in category
+    const body = document.createElement("div");
+    body.className = "cat-body";
+    filtered.forEach(b => {
+      const el = document.createElement("div");
+      el.className = "building-item" + (b.id === activeId ? " active" : "");
+      el.innerHTML = `
+        <div class="b-info">
+          <div class="b-name">${b.name}</div>
+          ${b.meta ? `<div class="b-meta">${b.meta}</div>` : ""}
+        </div>
+        <div class="b-arrow">›</div>
+      `;
+      el.addEventListener("click", () => loadBuilding(b));
+      body.appendChild(el);
+    });
+    listEl.appendChild(body);
   });
+
+  countEl.textContent = `${totalShown} total`;
+  if (totalShown === 0) {
+    listEl.innerHTML = `<div style="padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px;">No buildings found.</div>`;
+  }
 }
+
 
 // ── LOAD BUILDING ──────────────────────────────────────────────
 async function loadBuilding(b) {
