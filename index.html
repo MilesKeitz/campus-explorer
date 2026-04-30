@@ -389,6 +389,15 @@ const CATEGORIES = [
     name: "College of Architecture and Environmental Design",
     buildings: []
   },
+
+  // ============================================================
+  // College Life
+  // ============================================================
+
+  {
+    name: "College Life",
+    buildings: []
+  },
   
 
 
@@ -511,7 +520,8 @@ function renderList(filter = "") {
     const header = document.createElement("div");
     header.className = "cat-header";
     header.innerHTML = `<span>${cat.name}</span><span class="cat-count">${filtered.length}</span>`;
-    header.addEventListener("click", () => {
+    header.addEventListener("click", (e) => {
+      if (e.target.closest(".building-item")) return;
       const body = header.nextSibling;
       body.classList.toggle("collapsed");
       header.classList.toggle("collapsed");
