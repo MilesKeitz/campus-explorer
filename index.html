@@ -162,7 +162,7 @@
         </div>
         <div id="topbar-right">
           <div class="ctrl-pill"><span>WASD</span> move</div>
-          <div class="ctrl-pill"><span>QE</span> down/up</div>
+          <div class="ctrl-pill"><span>QE</span> up/down</div>
           <div class="ctrl-pill"><span>IJKL</span> look</div>
           <div class="ctrl-pill"><span>UO</span> rotate</div>
         </div>
@@ -375,7 +375,12 @@ const lookKeys = { i: false, k: false, j: false, l: false, u: false, o: false };
 const LOOK_SPEED = 0.02;
 const ROLL_SPEED = 0.02;
 
+function isTyping() {
+  return document.activeElement === searchEl;
+}
+
 window.addEventListener("keydown", e => {
+  if (isTyping()) return;
   const k = e.key.toLowerCase();
   if (k in lookKeys) { lookKeys[k] = true; e.preventDefault(); }
 });
@@ -385,7 +390,7 @@ window.addEventListener("keyup", e => {
 });
 
 function applyLookKeys() {
-  if (!camera) return;
+  if (!camera || isTyping()) return;
   let changed = false;
   if (lookKeys.j) { camYaw   += LOOK_SPEED; changed = true; }
   if (lookKeys.l) { camYaw   -= LOOK_SPEED; changed = true; }
@@ -698,13 +703,15 @@ function stopTour() {
 
 window.tourTogglePlay = function() {
   if (tourPlaying) {
-    stopTour();
+    tourPlaying = false;
+    if (tourAnimId) { cancelAnimationFrame(tourAnimId); tourAnimId = null; }
+    if (tourTimer) { clearTimeout(tourTimer); tourTimer = null; }
+    updateTourUI();
     tourBar.classList.add("visible");
   } else {
     if (!getKF().length) return;
     tourPlaying = true;
     updateTourUI();
-    // Schedule advance from current stop rather than re-flying to same spot
     tourTimer = setTimeout(advance, HOLD_MS);
   }
 };
@@ -725,9 +732,11 @@ window.tourPrev = function() {
 
 // Pause tour on manual interaction
 wrap.addEventListener("pointerdown", () => {
-  if (tourPlaying) { stopTour(); tourBar.classList.add("visible"); }
+  canvasFocused = true;
+  searchEl.blur();
 });
 
+searchEl.addEventListener("focus", () => { canvasFocused = false; });
 searchEl.addEventListener("input", e => renderList(e.target.value));
 renderList();
 </script>
