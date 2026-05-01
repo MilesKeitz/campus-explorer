@@ -120,6 +120,10 @@
     .cat-header.collapsed + .cat-body { display:none; }
     .cat-count { background:var(--border); border-radius:10px; padding:1px 7px; font-size:10px; color:var(--text-muted); }
 
+    #minimap { position:absolute; top:12px; left:12px; width:160px; border-radius:10px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.3); display:none; z-index:15; border:2px solid rgba(255,255,255,0.2); }
+    #minimap.show { display:block; }
+    #minimap-img { width:100%; display:block; }
+    #minimap-label { background:rgba(21,71,52,0.85); color:white; font-size:10px; padding:5px 8px; font-family:'Source Sans 3',sans-serif; letter-spacing:0.04em; }
 
     #stripe { height:4px; background:linear-gradient(90deg,var(--green) 60%,var(--gold) 100%); flex-shrink:0; }
   </style>
@@ -192,6 +196,10 @@
         </div>
 
         <button id="copy-btn" onclick="copyPos()">📋 Copy Camera Position</button>
+        <div id="minimap">
+          <img id="minimap-img" src="" alt="Building location"/>
+          <div id="minimap-label"></div>
+        </div>
         <div id="copy-toast">✓ Position copied!</div>
 
         <div id="tour-bar">
@@ -246,6 +254,7 @@ const CATEGORIES = [
         name: "Warren J. Baker Center for Science and Mathematics",
         file: "baker_geocam_2.splat",
         meta: "Bailey College of Science and Mathematics",
+        thumbnail: "baker_mini_map.jpg",
 
         // BOUNDARY: tweak center/radius once splat loads
         bounds: {
@@ -284,6 +293,7 @@ const CATEGORIES = [
           name: "William and Linda Frost Center for Research and Innovation",
           file: "frost.splat",
           meta: "Bailey College of Science and Mathematics",
+          thumbnail: "frost_mini_map.jpg",
 
           bounds: {
           center: new THREE.Vector3(0, 0, 0),
@@ -328,6 +338,7 @@ const CATEGORIES = [
         name: "Frank E. Pilling Computer Science",
         file: "frank.splat",
         meta: "College of Engineering",
+        thumbnail: "frank_mini_map.jpg",
 
         bounds: {
         center: new THREE.Vector3(0, 0, 0),
@@ -402,6 +413,7 @@ const CATEGORIES = [
         name: "Cal Poly Recreation Center",
         file: "rec_center.splat",
         meta: "College Life",
+        thumbnail: "rec_center_mini_map.jpg",
 
         bounds: {
         center: new THREE.Vector3(0, 0, 0),
@@ -520,6 +532,7 @@ function destroyViewer() {
     threeRenderer = null;
   }
   spark = null; scene = null; camera = null; controls = null; splatMesh = null;
+  document.getElementById("minimap")?.classList.remove("show");
 }
 
 // ── BUILDING LIST ──────────────────────────────────────────────
@@ -683,6 +696,16 @@ async function loadBuilding(b) {
       footerSt.textContent = `Viewing: ${b.name}`;
       copyBtn.classList.add("show");
       tourToggleBtn.classList.add("show");
+      const minimap = document.getElementById("minimap");
+      const minimapImg = document.getElementById("minimap-img");
+      const minimapLabel = document.getElementById("minimap-label");
+      if (b.thumbnail) {
+        minimapImg.src = `${BASE_URL}/${b.thumbnail}`;
+        minimapLabel.textContent = b.name;
+        minimap.classList.add("show");
+      } else {
+        minimap.classList.remove("show");
+      }
       updateTourUI();
 
       // Jump to first keyframe as starting viewpoint
