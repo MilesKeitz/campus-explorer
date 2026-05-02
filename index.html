@@ -124,8 +124,14 @@
     #minimap.show { display:block; }
     #minimap-img { width:100%; display:block; }
     #minimap-label { background:rgba(21,71,52,0.85); color:white; font-size:10px; padding:5px 8px; font-family:'Source Sans 3',sans-serif; letter-spacing:0.04em; }
+    #minimap-expand { position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; background:rgba(21,71,52,0.85); color:white; border:none; cursor:pointer; font-size:12px; display:none; align-items:center; justify-content:center; transition:background 0.15s; }
+    #minimap-expand:hover { background:var(--green); }
+    #minimap:hover #minimap-expand { display:flex; }
+    #minimap.enlarged { width:320px; }
+    #minimap.enlarged #minimap-expand { display:flex; }
 
     #stripe { height:4px; background:linear-gradient(90deg,var(--green) 60%,var(--gold) 100%); flex-shrink:0; }
+
   </style>
 </head>
 <body>
@@ -199,6 +205,7 @@
         <div id="minimap">
           <img id="minimap-img" src="" alt="Building location"/>
           <div id="minimap-label"></div>
+          <button id="minimap-expand" onclick="toggleMiniMap()">⛶</button>
         </div>
         <div id="copy-toast">✓ Position copied!</div>
 
@@ -759,6 +766,14 @@ window.copyPos = function() {
     copyToast.classList.add("show");
     setTimeout(() => copyToast.classList.remove("show"), 2200);
   });
+};
+
+// -- Toggle Minimap --------------------------------------------
+window.toggleMinimap = function() {
+  const minimap = document.getElementById("minimap");
+  const btn = document.getElementById("minimap-expand");
+  minimap.classList.toggle("enlarged");
+  btn.textContent = minimap.classList.contains("enlarged") ? "⛭" : "⛶";
 };
 
 // ── TOUR ──────────────────────────────────────────────────────
