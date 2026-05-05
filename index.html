@@ -130,6 +130,11 @@
     #minimap.enlarged { width:600px; }
     #minimap.enlarged #minimap-expand { display:flex; }
 
+    /* RESET POSITION BUTTON */
+    #reset-btn { position:absolute; top:12px; right:150px; background:rgba(21,71,52,0.85); color:white; border:none; border-radius:8px; padding:7px 13px; font-size:11px; cursor:pointer; font-family:'Source Sans 3',sans-serif; letter-spacing:0.05em; display:none; align-items:center; gap:6px; backdrop-filter:blur(4px); transition:background 0.15s; z-index:15; }
+    #reset-btn:hover { background:var(--green); }
+    #reset-btn.show { display:flex; }
+
     #stripe { height:4px; background:linear-gradient(90deg,var(--green) 60%,var(--gold) 100%); flex-shrink:0; }
 
   </style>
@@ -202,6 +207,7 @@
         </div>
 
         <button id="copy-btn" onclick="copyPos()">📋 Copy Camera Position</button>
+        <button id="reset-btn" onclick="resetPosition()">⌂ Reset View</button>
         <div id="minimap">
           <img id="minimap-img" src="" alt="Building location"/>
           <div id="minimap-label"></div>
@@ -540,6 +546,7 @@ function destroyViewer() {
   }
   spark = null; scene = null; camera = null; controls = null; splatMesh = null;
   document.getElementById("minimap")?.classList.remove("show");
+  document.getElementById("reset-btn")?.classList.remove("show");
 }
 
 // ── BUILDING LIST ──────────────────────────────────────────────
@@ -698,6 +705,7 @@ async function loadBuilding(b) {
     });
 
     setTimeout(() => {
+      document.getElementById("reset-btn").classList.add("show");
       loadingOvl.classList.remove("visible");
       footerDot.className  = "footer-dot live";
       footerSt.textContent = `Viewing: ${b.name}`;
@@ -843,6 +851,20 @@ function flyTo(idx) {
   }
   requestAnimationFrame(step);
 }
+
+window.resetPosition = function() {
+  if (!camera || !activeBuilding) return;
+  const kf = activeBuilding.tourKeyframes;
+  if (kf && kf.length > 0) {
+    const { pos, yaw = 0, pitch = 0, roll = 0 } = kf[0];
+    camera.position.set(pos.x, pos.y, pos.z);
+    camYaw = yaw; camPitch = pitch; camRoll = roll;
+    const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+    const qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
+    const qR = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll);
+    camera.quaternion.copy(qY.clone().multiply(qP).multiply(qR));
+  }
+};
 
 function advance() {
   const kf = getKF();
