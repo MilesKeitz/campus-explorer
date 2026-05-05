@@ -148,6 +148,32 @@
     .settings-row input[type=range] { flex:1; accent-color:var(--green); }
     .settings-row span { font-size:12px; color:var(--text); min-width:32px; text-align:right; }
 
+    /* INFO DRAWER */
+    #info-tab { position:absolute; right:0; top:50%; transform:translateY(-50%); background:rgba(21,71,52,0.85); color:white; width:20px; height:60px; display:none; align-items:center; justify-content:center; cursor:pointer; border-radius:8px 0 0 8px; font-size:20px; z-index:15; backdrop-filter:blur(4px); transition:background 0.15s; user-select:none; }
+    #info-tab:hover { background:var(--green); }
+    #info-tab.show { display:flex; }
+    #info-tab.open { transform:translateY(-50%) scaleX(-1); }
+
+    #info-drawer { position:absolute; right:-320px; top:0; width:320px; height:100%; background:white; box-shadow:-4px 0 24px rgba(0,0,0,0.15); z-index:14; display:flex; flex-direction:column; transition:right 0.3s ease; overflow:hidden; }
+    #info-drawer.open { right:0; }
+
+    #drawer-header { padding:16px 20px; background:var(--green); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    #drawer-building-name { font-family:'Playfair Display',serif; font-size:14px; font-weight:600; color:white; line-height:1.3; }
+    #drawer-close { background:none; border:none; color:rgba(255,255,255,0.7); cursor:pointer; font-size:16px; padding:0; transition:color 0.15s; }
+    #drawer-close:hover { color:white; }
+
+    #drawer-content { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:14px; }
+    #drawer-content::-webkit-scrollbar { width:4px; }
+    #drawer-content::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+    #drawer-empty { flex:1; display:none; align-items:center; justify-content:center; text-align:center; font-size:13px; color:var(--text-muted); padding:20px; }
+    #drawer-empty.show { display:flex; }
+
+    .drawer-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--green); margin-bottom:5px; }
+    .drawer-section { background:var(--cream); border-radius:8px; padding:12px 14px; font-size:13px; color:var(--text); line-height:1.6; }
+    .drawer-field { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:8px; }
+    .drawer-type-badge { background:var(--border); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--text-mid); font-weight:600; }
+
     #stripe { height:4px; background:linear-gradient(90deg,var(--green) 60%,var(--gold) 100%); flex-shrink:0; }
 
   </style>
@@ -222,6 +248,24 @@
 
         <button id="copy-btn" onclick="copyPos()">📋 Copy Camera Position</button>
         <button id="reset-btn" onclick="resetPosition()">⌂ Reset View</button>
+
+        <!-- Info Drawer -->
+        <div id="info-tab" onclick="toggleDrawer()">&#8249;</div>
+        <div id="info-drawer">
+          <div id="drawer-header">
+            <div id="drawer-building-name"></div>
+            <button id="drawer-close" onclick="toggleDrawer()">✕</button>
+          </div>
+          <div id="drawer-content">
+            <div class="drawer-section" id="drawer-description"></div>
+            <div class="drawer-field" id="drawer-type"></div>
+            <div class="drawer-section" id="drawer-facts"></div>
+            <div class="drawer-section" id="drawer-classes"></div>
+            <div class="drawer-section" id="drawer-story"></div>
+          </div>
+          <div id="drawer-empty">No information available for this building yet.</div>
+        </div>
+
         <div id="settings-panel">
           <div class="settings-title">Tour Settings</div>
           <div class="settings-row">
@@ -290,7 +334,7 @@ const CATEGORIES = [
     name: "Bailey College of Science and Mathematics",
     buildings: [
       {
-        id: "b1",
+        id: "180",
         name: "Warren J. Baker Center for Science and Mathematics",
         file: "baker_geocam_2.splat",
         meta: "Bailey College of Science and Mathematics",
@@ -329,7 +373,7 @@ const CATEGORIES = [
       },
 
       {
-          id: "b2",
+          id: "181",
           name: "William and Linda Frost Center for Research and Innovation",
           file: "frost.splat",
           meta: "Bailey College of Science and Mathematics",
@@ -374,7 +418,7 @@ const CATEGORIES = [
     name: "College of Engineering",
     buildings: [
       {
-        id: "b3",
+        id: "14",
         name: "Frank E. Pilling Computer Science",
         file: "frank.splat",
         meta: "College of Engineering",
@@ -449,7 +493,7 @@ const CATEGORIES = [
     name: "College Life",
     buildings: [
       {
-        id: "b4",
+        id: "43",
         name: "Cal Poly Recreation Center",
         file: "rec_center.splat",
         meta: "College Life",
@@ -574,6 +618,9 @@ function destroyViewer() {
   spark = null; scene = null; camera = null; controls = null; splatMesh = null;
   document.getElementById("minimap")?.classList.remove("show");
   document.getElementById("reset-btn")?.classList.remove("show");
+
+  document.getElementById("info-tab")?.classList.remove("show");
+  document.getElementById("info-drawer")?.classList.remove("open");
 }
 
 // ── BUILDING LIST ──────────────────────────────────────────────
@@ -634,6 +681,8 @@ async function loadBuilding(b) {
   activeId = b.id;
   activeBuilding = b;
   renderList(searchEl.value);
+
+  populateDrawer(b);
 
   topTitle.textContent = b.name;
   topSub.textContent   = b.meta || "Cal Poly SLO Campus";
@@ -797,6 +846,70 @@ document.getElementById("hold-speed").addEventListener("input", function() {
   HOLD_MS_current = parseInt(this.value);
   document.getElementById("hold-speed-val").textContent = (HOLD_MS_current / 1000).toFixed(1) + "s";
 });
+
+
+// ── INFO DRAWER ────────────────────────────────────────────
+let buildingData = null;
+
+// Load JSON once on startup
+fetch("https://pub-a2f3fdfc4c7b44ec861e235eeeacaf6f.r2.dev/buildings.json")
+  .then(r => r.json())
+  .then(data => { buildingData = data; })
+  .catch(err => console.warn("Could not load building data:", err));
+
+window.toggleDrawer = function() {
+  const drawer = document.getElementById("info-drawer");
+  const tab    = document.getElementById("info-tab");
+  drawer.classList.toggle("open");
+  tab.classList.toggle("open");
+};
+
+function populateDrawer(building) {
+  const tab    = document.getElementById("info-tab");
+  const drawer = document.getElementById("info-drawer");
+  const empty  = document.getElementById("drawer-empty");
+  const content = document.getElementById("drawer-content");
+
+  document.getElementById("drawer-building-name").textContent = building.name;
+  tab.classList.add("show");
+
+  // Find matching record by building_number === building.id
+  const info = buildingData?.find(d => d.building_number === building.id);
+
+  if (!info || (!info.description && !info.type && !info.fun_facts && !info.classes && !info.lbd_story)) {
+    content.style.display = "none";
+    empty.classList.add("show");
+    return;
+  }
+
+  content.style.display = "flex";
+  empty.classList.remove("show");
+
+  // Description
+  const desc = document.getElementById("drawer-description");
+  desc.style.display = info.description ? "block" : "none";
+  desc.innerHTML = info.description ? `<div class="drawer-label">About</div>${info.description}` : "";
+
+  // Type
+  const type = document.getElementById("drawer-type");
+  type.style.display = info.type ? "block" : "none";
+  type.innerHTML = info.type ? `<span class="drawer-type-badge">🏛 ${info.type}</span>` : "";
+
+  // Fun Facts
+  const facts = document.getElementById("drawer-facts");
+  facts.style.display = info.fun_facts ? "block" : "none";
+  facts.innerHTML = info.fun_facts ? `<div class="drawer-label">Fun Facts</div>${info.fun_facts}` : "";
+
+  // Classes
+  const classes = document.getElementById("drawer-classes");
+  classes.style.display = info.classes ? "block" : "none";
+  classes.innerHTML = info.classes ? `<div class="drawer-label">Classes Held Here</div>${info.classes}` : "";
+
+  // LBD Story
+  const story = document.getElementById("drawer-story");
+  story.style.display = info.lbd_story ? "block" : "none";
+  story.innerHTML = info.lbd_story ? `<div class="drawer-label">Learn By Doing Story</div>${info.lbd_story}` : "";
+}
 
 
 // ── BOUNDS ────────────────────────────────────────────────────
