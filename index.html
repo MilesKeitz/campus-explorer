@@ -135,6 +135,18 @@
     #reset-btn:hover { background:var(--green); }
     #reset-btn.show { display:flex; }
 
+    /* SPEED SETTINGS */
+    #settings-btn { background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:5px 10px; font-size:13px; cursor:pointer; transition:background 0.15s; margin-right:8px; }
+    #settings-btn:hover { background:rgba(255,255,255,0.22); }
+
+    #settings-panel { position:absolute; top:12px; right:12px; background:white; border-radius:12px; padding:16px 20px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:20; display:none; min-width:240px; border:1px solid var(--border); }
+    #settings-panel.show { display:block; }
+    .settings-title { font-family:'Playfair Display',serif; font-size:14px; font-weight:600; color:var(--green); margin-bottom:14px; }
+    .settings-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .settings-row label { font-size:12px; color:var(--text-muted); min-width:90px; }
+    .settings-row input[type=range] { flex:1; accent-color:var(--green); }
+    .settings-row span { font-size:12px; color:var(--text); min-width:32px; text-align:right; }
+
     #stripe { height:4px; background:linear-gradient(90deg,var(--green) 60%,var(--gold) 100%); flex-shrink:0; }
 
   </style>
@@ -151,6 +163,7 @@
     <div class="htitle">Campus 3D Explorer</div>
     <div style="margin-left:auto;display:flex;align-items:center;">
       <button id="tour-toggle" onclick="toggleTour()">▶ Guided Tour</button>
+      <button id="settings-btn" onclick="toggleSettings()">⚙️</button>
       <div class="badge">Gaussian Splat Viewer</div>
     </div>
   </header>
@@ -208,6 +221,19 @@
 
         <button id="copy-btn" onclick="copyPos()">📋 Copy Camera Position</button>
         <button id="reset-btn" onclick="resetPosition()">⌂ Reset View</button>
+        <div id="settings-panel">
+          <div class="settings-title">Tour Settings</div>
+          <div class="settings-row">
+            <label>Flight Speed</label>
+            <input type="range" id="fly-speed" min="500" max="6000" step="100" value="2200"/>
+            <span id="fly-speed-val">2.2s</span>
+          </div>
+          <div class="settings-row">
+            <label>Hold Duration</label>
+            <input type="range" id="hold-speed" min="500" max="10000" step="500" value="3500"/>
+            <span id="hold-speed-val">3.5s</span>
+          </div>
+        </div>
         <div id="minimap">
           <img id="minimap-img" src="" alt="Building location"/>
           <div id="minimap-label"></div>
@@ -531,8 +557,8 @@ function applyLookKeys() {
   camera.quaternion.copy(qYaw).multiply(qPitch).multiply(qRoll);
 }
 
-const HOLD_MS = 3500;
-const FLY_MS  = 2200;
+let HOLD_MS = 3500;
+let FLY_MS  = 2200;
 
 // ── DESTROY VIEWER ─────────────────────────────────────────────
 function destroyViewer() {
@@ -750,6 +776,26 @@ async function loadBuilding(b) {
   }
 }
 
+
+// -- Speed Settings ------------------------------------
+let FLY_MS_current  = 2200;
+let HOLD_MS_current = 3500;
+
+window.toggleSettings = function() {
+  document.getElementById("settings-panel").classList.toggle("show");
+};
+
+document.getElementById("fly-speed").addEventListener("input", function() {
+  FLY_MS_current = parseInt(this.value);
+  document.getElementById("fly-speed-val").textContent = (FLY_MS_current / 1000).toFixed(1) + "s";
+});
+
+document.getElementById("hold-speed").addEventListener("input", function() {
+  HOLD_MS_current = parseInt(this.value);
+  document.getElementById("hold-speed-val").textContent = (HOLD_MS_current / 1000).toFixed(1) + "s";
+});
+
+
 // ── BOUNDS ────────────────────────────────────────────────────
 function enforceBounds({ center, radius, minY, maxY }) {
   if (!camera) return;
@@ -836,7 +882,7 @@ function flyTo(idx) {
   function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
   function step() {
-    const t = Math.min((performance.now() - t0) / FLY_MS, 1);
+    const t = Math.min((performance.now() - t0) / FLY_MS_current, 1);
     const e = ease(t);
     camera.position.lerpVectors(startPos, endPos, e);
     camera.quaternion.slerpQuaternions(startQ, endQ, e);
@@ -846,7 +892,7 @@ function flyTo(idx) {
       tourAnimId = null;
       // Sync camYaw/pitch/roll so IJKL keys work correctly after landing
       camYaw = yaw; camPitch = pitch; camRoll = roll;
-      if (tourPlaying) tourTimer = setTimeout(advance, HOLD_MS);
+      if (tourPlaying) tourTimer = setTimeout(advance, HOLD_MS_current);
     }
   }
   requestAnimationFrame(step);
@@ -899,7 +945,7 @@ window.tourTogglePlay = function() {
     if (!getKF().length) return;
     tourPlaying = true;
     updateTourUI();
-    tourTimer = setTimeout(advance, HOLD_MS);
+    tourTimer = setTimeout(advance, HOLD_MS_current);
   }
 };
 
