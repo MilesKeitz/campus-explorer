@@ -136,7 +136,8 @@
     #reset-btn.show { display:flex; }
 
     /* SPEED SETTINGS */
-    #settings-btn { background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:5px 10px; font-size:13px; cursor:pointer; transition:background 0.15s; margin-right:8px; }
+    #settings-btn { display:none; background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:5px 12px; font-size:11px; cursor:pointer; transition:background 0.15s; margin-right:8px; font-family:'Source Sans 3',sans-serif; letter-spacing:0.05em; }
+    #settings-btn.show { display:block; }
     #settings-btn:hover { background:rgba(255,255,255,0.22); }
 
     #settings-panel { position:absolute; top:12px; right:12px; background:white; border-radius:12px; padding:16px 20px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:20; display:none; min-width:240px; border:1px solid var(--border); }
@@ -162,8 +163,8 @@
     <div class="hdivider"></div>
     <div class="htitle">Campus 3D Explorer</div>
     <div style="margin-left:auto;display:flex;align-items:center;">
-      <button id="tour-toggle" onclick="toggleTour()">▶ Guided Tour</button>
       <button id="settings-btn" onclick="toggleSettings()">⚙️</button>
+      <button id="tour-toggle" onclick="toggleTour()">▶ Guided Tour</button>
       <div class="badge">Gaussian Splat Viewer</div>
     </div>
   </header>
@@ -646,6 +647,7 @@ async function loadBuilding(b) {
 
   tourBar.classList.remove("visible");
   tourToggleBtn.classList.remove("show", "on");
+  document.getElementById("settings-btn").classList.remove("show");
   copyBtn.classList.remove("show");
   destroyViewer();
 
@@ -737,6 +739,7 @@ async function loadBuilding(b) {
       footerSt.textContent = `Viewing: ${b.name}`;
       copyBtn.classList.add("show");
       tourToggleBtn.classList.add("show");
+      document.getElementById("settings-btn").classList.add("show");
       const minimap = document.getElementById("minimap");
       const minimapImg = document.getElementById("minimap-img");
       const minimapLabel = document.getElementById("minimap-label");
