@@ -682,8 +682,6 @@ async function loadBuilding(b) {
   activeBuilding = b;
   renderList(searchEl.value);
 
-  populateDrawer(b);
-
   topTitle.textContent = b.name;
   topSub.textContent   = b.meta || "Cal Poly SLO Campus";
   footerDot.className  = "footer-dot";
@@ -790,6 +788,8 @@ async function loadBuilding(b) {
       tourToggleBtn.classList.add("show");
       document.getElementById("settings-btn").classList.add("show");
       const minimap = document.getElementById("minimap");
+      document.getElementById("reset-btn").classList.add("show");
+      populateDrawer(b);  
       const minimapImg = document.getElementById("minimap-img");
       const minimapLabel = document.getElementById("minimap-label");
       if (b.thumbnail) {
