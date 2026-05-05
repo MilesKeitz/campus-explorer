@@ -858,11 +858,24 @@ fetch("https://pub-a2f3fdfc4c7b44ec861e235eeeacaf6f.r2.dev/buildings.json")
   .catch(err => console.warn("Could not load building data:", err));
 
 window.toggleDrawer = function() {
-  const drawer = document.getElementById("info-drawer");
-  const tab    = document.getElementById("info-tab");
+  const drawer    = document.getElementById("info-drawer");
+  const tab       = document.getElementById("info-tab");
+  const copyBtn   = document.getElementById("copy-btn");
+  const resetBtn  = document.getElementById("reset-btn");
+  const isOpening = !drawer.classList.contains("open");
+
   drawer.classList.toggle("open");
   tab.classList.toggle("open");
+
+  if (isOpening) {
+    copyBtn.classList.remove("show");
+    resetBtn.classList.remove("show");
+  } else {
+    copyBtn.classList.add("show");
+    resetBtn.classList.add("show");
+  }
 };
+
 
 function populateDrawer(building) {
   const tab    = document.getElementById("info-tab");
