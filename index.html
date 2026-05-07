@@ -1163,7 +1163,7 @@ renderList();
 
 <!-- Help Modal -->
 <div id="help-overlay" onclick="closeHelp(event)">
-  <div id="help-modal">
+  <div id="help-modal" onclick="event.stopPropagation()">
     <div id="help-header">
       <div id="help-title">Welcome to Cal Poly Campus Explorer</div>
       <button id="help-close" onclick="closeHelpBtn()">✕</button>
