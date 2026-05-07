@@ -759,31 +759,6 @@ async function loadBuilding(b) {
   });
 
 
-  // ── HELP MODAL ─────────────────────────────────────────────
-function openHelp() {
-  document.getElementById("help-overlay").classList.remove("hidden");
-}
-
-function closeHelpBtn() {
-  document.getElementById("help-overlay").classList.add("hidden");
-  if (document.getElementById("dont-show-again").checked) {
-    localStorage.setItem("calpolyHelpSeen", "true");
-  }
-}
-
-window.closeHelp = function(e) {
-  if (e.target === document.getElementById("help-overlay")) closeHelpBtn();
-};
-
-window.openHelp = openHelp;
-
-// Show on first visit unless user dismissed it
-if (!localStorage.getItem("calpolyHelpSeen")) {
-  document.addEventListener("DOMContentLoaded", () => openHelp());
-} else {
-  document.getElementById("help-overlay").classList.add("hidden");
-}
-
   // Resize handler
   const ro = new ResizeObserver(() => {
     if (!threeRenderer) return;
@@ -880,6 +855,33 @@ if (!localStorage.getItem("calpolyHelpSeen")) {
     renderList(searchEl.value);
     emptyState.style.display = "flex";
   }
+}
+
+
+
+// ── HELP MODAL ─────────────────────────────────────────────
+function openHelp() {
+  document.getElementById("help-overlay").classList.remove("hidden");
+}
+
+function closeHelpBtn() {
+  document.getElementById("help-overlay").classList.add("hidden");
+  if (document.getElementById("dont-show-again").checked) {
+    localStorage.setItem("calpolyHelpSeen", "true");
+  }
+}
+
+window.closeHelp = function(e) {
+  if (e.target === document.getElementById("help-overlay")) closeHelpBtn();
+};
+
+window.openHelp = openHelp;
+
+// Show on first visit unless user dismissed it
+if (!localStorage.getItem("calpolyHelpSeen")) {
+  document.addEventListener("DOMContentLoaded", () => openHelp());
+} else {
+  document.getElementById("help-overlay").classList.add("hidden");
 }
 
 
