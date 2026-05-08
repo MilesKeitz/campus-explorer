@@ -573,7 +573,25 @@ const CATEGORIES = [
 
   {
     name: "College of Architecture and Environmental Design",
-    buildings: []
+    buildings: [
+      {
+        id: "186",
+        name: "Construction Innovations Center",
+        file: "construction.splat",
+        meta: "College Life",
+        thumbnail: "construction_mini_map.jpg",
+
+        bounds: {
+        center: new THREE.Vector3(0, 0, 0),
+        radius: 20,
+        minY: -6,
+        maxY: 12,
+      },
+
+      tourKeyframes: [
+      ],
+    },
+    ]
   },
 
   // ============================================================
@@ -660,7 +678,7 @@ const CATEGORIES = [
         { pos:{x:-0.283,y:2.422,z:2.984}, yaw:-0.6800, pitch:-0.6800, roll:0.3800, label:"Viewpoint" },
         { pos:{x:0.481,y:1.885,z:2.506}, yaw:-0.3400, pitch:-0.6800, roll:0.1400, label:"Viewpoint" },
         { pos:{x:1.208,y:1.533,z:2.110}, yaw:0.0600, pitch:-0.6800, roll:-0.1000, label:"Viewpoint" },
-        
+
       ],
     },
       
